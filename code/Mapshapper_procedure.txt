@@ -1,0 +1,7 @@
+### Import county/state shape files
+### Import unemployment_elections dataset
+# Coming from a csv file, GEOID is numeric
+each "GEOID=String(GEOID).padStart(5,'0')"  
+join unemployment_elections keys=GEOID,GEOID
+classify per_point_diff breaks=-0.45,-0.25,-0.05,0,0.05,0.25,0.45 colors=#2166ac,#4393c3,#92c5de,#d1e5f0,#fddbc7,#f4a582,#d6604d,#b2182b save-as=color_margin_gop key-style=dataviz
+classify delta_unemployment breaks=0,.010,.020,.030,.040,.050,.06 colors=#ffffd9,#edf8b1,#c7e9b4,#7fcdbb,#41b6c4,#1d91c0,#225ea8,#0c2c84 save-as=color_delta_unemployment key-style=dataviz

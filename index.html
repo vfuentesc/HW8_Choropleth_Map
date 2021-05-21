@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .chart-container{
+            /* max-width: 1250px; */
+            /* margin: auto auto; */
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+
+        svg{
+            overflow: visible;
+            align-content: center;
+        }
+
+        h1 {
+            font-family: 'Raleway', sans-serif;
+            /* font-weight: lighter; */
+            font-size: 30px;
+            text-align: center;
+            margin-bottom: 5;
+        }
+        
+        h2 {
+            font-family: 'Raleway', sans-serif;
+            font-size: 20px;
+            line-height: 0px;
+            text-align: center;
+            margin-top: 5;
+        }
+
+        .popup{
+            position: absolute;
+            max-width: 250px;
+            height: 50px;
+            border: 0.5px solid grey;
+            background-color: white;
+            padding: 5px;
+            opacity: 0;
+        }
+
+        .grid_vfc {
+            display: grid;
+            grid-template-columns: 630px 630px;
+            grid-template-rows: auto;
+            column-gap: 5px;
+        }
+
+        .keys_viz{
+            height: 50px;
+            width: 200px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1>Can changes in unemployment rate explain 2020 Presidential Election Results?</h1>
+    <div class = "grid_vfc">
+        <h2 class = "headline">
+            2020 Presidential Election: Margin of Victory* <br>
+        </h1>
+        <h2 class = "headline">
+            Change in Unemployment level, 2020 vs 2019** <br>
+        </h1>
+    </div>
+
+    <div class = "grid_vfc keys_viz">
+        <img src="key_margin_gop.svg" style="width:200px;height:60px;margin-left:350px;">
+        <img src="key_delta_unemployment.svg" style="width:200px;height:60px;margin-left:325px;">
+    </div>
+    
+    
+    <div class = "chart-container grid-vfc">
+        <svg width="600px" height="400px" id="svg1"></svg>
+        <div class="popup"> </div>
+        <svg width="600px" height="400px" id="svg2"></svg>
+        <div class="popup"> </div>
+
+    </div>
+    <br>
+
+</body>
+
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://unpkg.com/topojson@3"></script>
+
+<script>
+
+    let width = 600;
+    let height = 400;
+    let svg1 = d3.select("body").select("#svg1")
+
+    d3.json("county_state_topo.json").then(function (data) {
+        
+
+        let counties = topojson.feature(data, data.objects.county)
+        let states = topojson.feature(data, data.objects.cb_2018_us_state_20m)
+        console.log({counties})
+        console.log({states})
+
+        let projection = d3.geoIdentity()
+            .fitSize([width, height], states)
+            .reflectY(true)                  // Reverding direction
+
+        let path = d3.geoPath(projection)
+        let popup = d3.select(".popup")
+
+        let reScaleLang = d3.scaleThreshold()
+                .domain([0]) //make sure to put this in brackets!
+                .range(["lost", "won"])
+
+
+        svg1.append("g")
+             .attr("class", "counties")
+             .selectAll("path")
+             .data(counties.features.filter(d => d.geometry != null))
+             .join("path")
+             .attr("d", path)
+             .attr("fill", d => d.properties.color_margin_gop)
+             .attr("stroke", "white")
+             .attr("stroke-width", 0.05)
+             .on("mouseover", function(pointer_event, d) {
+                d3.selectAll("path")
+                    .style("opacity", 0.75)
+                d3.select(this)
+                    .style("opacity", 1)
+                popup
+                    .style("opacity", 1)
+                    .style("left", (pointer_event.x + 20) + "px")
+                    .style("top", (pointer_event.y - 20) + "px")
+                    .html("In "+ d.properties.NAMELSAD + " (" + d.properties.state_name + "),<br>Trump " + reScaleLang(d.properties.per_point_diff) + " by " + d3.format(".2f")(Math.abs(d.properties.per_point_diff * 100)) + "pp.")
+            })
+            .on("mouseout", (pointer_event, d) =>{
+                d3.selectAll("path")
+                    .style("opacity", 1)
+                popup
+                    .style("opacity", 0)
+            })
+
+        svg1.append("g")
+            .attr("class", "states")
+            .selectAll("path")
+            .data(states.features)
+            .join("path")
+            .attr("d", path)
+            .attr("fill", "none")
+            .attr("stroke", "white")
+        
+        svg1.append("text")
+            .attr("class", "label")
+            .attr("x", 0)
+            .attr("y", height - 5)
+            .text("Source: Source: Data compiled by T. McGovern using data from The Guardian, townhall.com, Fox News, Politico, and the New York Times.")
+            .style("fill", "black")
+            .attr("font-size", 9)
+            .attr("font-family","sans-serif")
+
+        svg1.append("text")
+            .attr("class", "label")
+            .attr("x", 0)
+            .attr("y", height - 15)
+            .text("*Alaska provides electoral results by Electoral Disctrict")
+            .style("fill", "black")
+            .attr("font-size", 9)
+            .attr("font-family","sans-serif")
+    })
+
+    let svg2 = d3.select("body").select("#svg2")
+
+    d3.json("county_state_topo.json").then(function (data) {
+        
+
+        let counties = topojson.feature(data, data.objects.county)
+        let states = topojson.feature(data, data.objects.cb_2018_us_state_20m)
+        console.log({counties})
+        console.log({states})
+
+        let projection = d3.geoIdentity()
+            .fitSize([width, height], states)
+            .reflectY(true)                  // Reverding direction
+
+        let path = d3.geoPath(projection)
+        let popup = d3.select(".popup")
+
+        let reScaleLang = d3.scaleThreshold()
+                .domain([0]) //make sure to put this in brackets!
+                .range(["droped", "raised"])
+
+
+        svg2.append("g")
+             .attr("class", "counties")
+             .selectAll("path")
+             .data(counties.features.filter(d => d.geometry != null))
+             .join("path")
+             .attr("d", path)
+             .attr("fill", d => d.properties.color_delta_unemployment)
+             .attr("stroke", "white")
+             .attr("stroke-width", 0.05)
+             .on("mouseover", function(pointer_event, d) {
+                d3.selectAll("path")
+                    .style("opacity", 0.75)
+                d3.select(this)
+                    .style("opacity", 1)
+                popup
+                    .style("opacity", 1)
+                    .style("left", (pointer_event.x + 20) + "px")
+                    .style("top", (pointer_event.y - 20) + "px")
+                    .html("In "+ d.properties.NAMELSAD + " (" + d.properties.state_name + "),<br> the unemployment rate " + reScaleLang(d.properties.delta_unemployment) + " by " + d3.format(".2f")(Math.abs(d.properties.delta_unemployment * 100)) + "pp.")
+            })
+            .on("mouseout", (pointer_event, d) =>{
+                d3.selectAll("path")
+                    .style("opacity", 1)
+                popup
+                    .style("opacity", 0)
+            })
+
+        svg2.append("g")
+            .attr("class", "states")
+            .selectAll("path")
+            .data(states.features)
+            .join("path")
+            .attr("d", path)
+            .attr("fill", "none")
+            .attr("stroke", "white")
+
+        svg2.append("text")
+            .attr("class", "label")
+            .attr("x", 0)
+            .attr("y", height - 5)
+            .text("Source: Local Area Unemployment Statistics - BLS")
+            .style("fill", "black")
+            .attr("font-size", 9)
+            .attr("font-family","sans-serif")
+
+        svg2.append("text")
+            .attr("class", "label")
+            .attr("x", 0)
+            .attr("y", height - 15)
+            .text("**Comparison only takes into account the period January-October.")
+            .style("fill", "black")
+            .attr("font-size", 9)
+            .attr("font-family","sans-serif")
+      
+    })
+
+
+
+</script>
+
+
+
+</html>
