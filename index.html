@@ -6,18 +6,18 @@
     <style>
         .chart-container{
             /* max-width: 1250px; */
-            /* margin: auto auto; */
+            margin: auto auto;
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
         }
 
         svg{
             overflow: visible;
-            align-content: center;
+            margin-top: -55px;
         }
 
         h1 {
             font-family: 'Raleway', sans-serif;
-            /* font-weight: lighter; */
+            max-width: 12500px;
             font-size: 30px;
             text-align: center;
             margin-bottom: 5;
@@ -25,10 +25,12 @@
         
         h2 {
             font-family: 'Raleway', sans-serif;
-            font-size: 20px;
+            font-size: 18px;
             line-height: 0px;
             text-align: center;
             margin-top: 5;
+            margin-bottom:10;
+            text-decoration-line: underline;
         }
 
         .popup{
@@ -41,14 +43,7 @@
             opacity: 0;
         }
 
-        .grid_vfc {
-            display: grid;
-            grid-template-columns: 630px 630px;
-            grid-template-rows: auto;
-            column-gap: 5px;
-        }
-
-        .keys_viz{
+       .keys_viz{
             height: 50px;
             width: 200px;
             text-align: center;
@@ -59,30 +54,27 @@
 
 <body>
     <h1>Can changes in unemployment rate explain 2020 Presidential Election Results?</h1>
-    <div class = "grid_vfc">
+    <div>
         <h2 class = "headline">
             2020 Presidential Election: Margin of Victory* <br>
-        </h1>
+        </h2>
+        <img src="key_margin_gop.svg" style="width:300px;height:75px;margin-left:600px;">
+        <div class = "chart-container grid-vfc">
+            <svg width="1250px" height="800px" id="svg1"></svg>
+            <div class="popup"> </div>
+        </div>
+    </div>
+    <br><br><br>
+    <div>
         <h2 class = "headline">
             Change in Unemployment level, 2020 vs 2019** <br>
-        </h1>
-    </div>
-
-    <div class = "grid_vfc keys_viz">
-        <img src="key_margin_gop.svg" style="width:200px;height:60px;margin-left:350px;">
-        <img src="key_delta_unemployment.svg" style="width:200px;height:60px;margin-left:325px;">
-    </div>
-    
-    
-    <div class = "chart-container grid-vfc">
-        <svg width="600px" height="400px" id="svg1"></svg>
-        <div class="popup"> </div>
-        <svg width="600px" height="400px" id="svg2"></svg>
-        <div class="popup"> </div>
-
-    </div>
-    <br>
-
+        </h2>
+        <img src="key_delta_unemployment.svg" style="width:300px;height:75px;margin-left:600px;">
+        <div class = "chart-container grid-vfc">
+            <svg width="1250px" height="800px" id="svg2"></svg>
+            <div class="popup"> </div>
+        </div>
+    </div> 
 </body>
 
 <script src="https://d3js.org/d3.v6.min.js"></script>
@@ -90,8 +82,8 @@
 
 <script>
 
-    let width = 600;
-    let height = 400;
+    let width = 1000;
+    let height = 700;
     let svg1 = d3.select("body").select("#svg1")
 
     d3.json("county_state_topo.json").then(function (data) {
